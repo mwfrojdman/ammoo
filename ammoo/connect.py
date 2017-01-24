@@ -114,13 +114,13 @@ async def connect(
                 password = parsed_url.password
         auth = PasswordAuthentication(login, password)
 
+    if loop is None:
+        loop = asyncio.get_event_loop()
+
     protocol_factory = partial(
         connection_factory, virtualhost=virtualhost, loop=loop, heartbeat_interval=heartbeat_interval, auth=auth,
         frame_max=frame_max
     )
-
-    if loop is None:
-        loop = asyncio.get_event_loop()
 
     transport, protocol = await loop.create_connection(protocol_factory, host, port, ssl=ssl_context)
 
