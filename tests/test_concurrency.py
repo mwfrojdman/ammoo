@@ -79,11 +79,11 @@ async def consume_messages(channel: Channel, names: Names, do_ack: bool, loop, b
 
 @pytest.mark.timeout(60)
 @pytestmark
-async def test_concurrency(event_loop, rabbitmq_host):
+async def test_concurrency(connect_to_broker, event_loop):
     logger = logging.getLogger('testcase')
     iterations = 10
     publish_batch_size = 300
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel_one, connection.channel() as channel_two:
             names = await setup_concurrent_queues(channel_one)
             consumed_ids = set()
