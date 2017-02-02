@@ -5,9 +5,13 @@ python:
 services:
 - rabbitmq
 env:
-- AMMOO_TEST_VIRTUALHOST=/ AMMOO_TEST_AMQP_HOST=localhost PYTHONPATH=tests/lib
+  global:
+  - AMMOO_TEST_VIRTUALHOST=/
+  - AMMOO_TEST_AMQP_HOST=localhost
 install:
 - pip install .[test]
+before_script:
+- export PYTHONPATH=$PYTHONPATH:tests/lib
 script:
 - pytest tests
 notifications:
