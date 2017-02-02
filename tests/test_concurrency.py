@@ -77,7 +77,7 @@ async def consume_messages(channel: Channel, names: Names, do_ack: bool, loop, b
                     tasks = []
 
 
-@pytest.mark.timeout(30)
+@pytest.mark.timeout(60)
 @pytestmark
 async def test_concurrency(event_loop, rabbitmq_host):
     logger = logging.getLogger('testcase')
