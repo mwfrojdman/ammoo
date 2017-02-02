@@ -13,6 +13,7 @@ install:
 before_script:
 - export PYTHONPATH=$PYTHONPATH:tests/lib
 script:
+- env
 - pytest tests
 notifications:
   email: true
