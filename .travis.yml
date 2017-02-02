@@ -11,9 +11,10 @@ env:
 install:
 - pip install .[test]
 before_script:
-- export PYTHONPATH=$PYTHONPATH:tests/lib
+- if test -z $PYTHONPATH; then export PYTHONPATH=tests/lib; else export PYTHONPATH=$PYTHONPATH:tests/lib; fi
 script:
 - env
+- pwd
 - pytest tests
 notifications:
   email: true
