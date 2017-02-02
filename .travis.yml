@@ -11,7 +11,7 @@ env:
 install:
 - pip install .[test]
 before_script:
-- export PYTHONPATH=$(pwd)/tests/lib
+- export PYTHONPATH=$(pwd)/tests/helpers
 script:
 - env
 - pwd
