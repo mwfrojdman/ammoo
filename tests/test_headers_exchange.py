@@ -3,7 +3,7 @@ from pytest import raises
 
 from ammoo.connect import connect
 from ammoo.exceptions.channel import EmptyQueue
-from tests.conftest import pytestmark
+from ammoo_pytest_helpers import pytestmark
 
 
 # marking as rabbitmq36, because the non-string values do not seem to work on 3.3

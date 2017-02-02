@@ -9,10 +9,8 @@ from ammoo.wire.classes import CLASS_BASIC
 from ammoo.connect import connect
 from ammoo.exceptions.channel import EmptyQueue, ServerClosedChannel
 from ammoo.exceptions.connection import ServerClosedConnection
-from ammoo.wire.frames.method.channel import ChannelCloseParameters
-from ammoo.wire.frames.method.connection import ConnectionCloseParameters
 from ammoo.wire.low.misc import DELIVERY_MODE_NON_PERSISTENT, DELIVERY_MODE_PERSISTENT
-from tests.conftest import pytestmark, check_clean_channel_close, check_clean_connection_close, setup_channel
+from ammoo_pytest_helpers import pytestmark, check_clean_connection_close, check_clean_channel_close, setup_channel
 
 
 @pytest.mark.timeout(7)

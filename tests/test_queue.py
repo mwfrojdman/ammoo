@@ -8,7 +8,7 @@ from ammoo.connect import connect
 from ammoo.exceptions.channel import ServerClosedChannel, EmptyQueue
 from ammoo.wire.classes import CLASS_BASIC, CLASS_QUEUE
 from ammoo.wire.methods import METHOD_BASIC_GET, METHOD_QUEUE_PURGE, METHOD_QUEUE_DECLARE
-from tests.conftest import pytestmark, check_clean_connection_close, check_clean_channel_close, aenumerate, azip
+from ammoo_pytest_helpers import pytestmark, check_clean_connection_close, check_clean_channel_close, aenumerate, azip
 
 
 @pytest.mark.timeout(7)

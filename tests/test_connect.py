@@ -5,7 +5,7 @@ from pytest import raises
 
 from ammoo.connect import connect
 from ammoo.connection import Connection
-from tests.conftest import pytestmark
+from ammoo_pytest_helpers import pytestmark
 
 
 @pytestmark

@@ -3,7 +3,7 @@ import pytest
 from ammoo.connect import connect
 from ammoo.connection import Connection
 from ammoo.wire.frames import FRAME_TYPE_BODY
-from tests.conftest import pytestmark, check_clean_channel_close, check_clean_connection_close, setup_channel
+from ammoo_pytest_helpers import pytestmark, check_clean_connection_close, check_clean_channel_close, setup_channel
 
 
 class FrameMaxConnection(Connection):

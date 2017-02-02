@@ -10,9 +10,9 @@ from ammoo.wire.frames.method.connection import parse_connection_tune_parameters
 from ammoo.auth.password import PasswordAuthentication
 from ammoo.connect import connect
 from ammoo.connection import Connection
-from ammoo.exceptions.connection import ServerClosedConnection, ClientClosedConnection, HeartbeatTimeout, ConnectionLost
+from ammoo.exceptions.connection import HeartbeatTimeout, ConnectionLost
 
-from tests.conftest import pytestmark, check_clean_connection_close
+from ammoo_pytest_helpers import pytestmark, check_clean_connection_close
 
 
 class _NoClientHeartbeatsConnection(Connection):

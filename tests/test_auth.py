@@ -8,7 +8,7 @@ from ammoo.auth.mechanisms.sasl_plain import SaslPlainAuth
 from ammoo.auth.password import PasswordAuthentication
 from ammoo.connect import connect
 from ammoo.exceptions.connection import ServerClosedConnection, ServerAuthMechanismsNotSupportedError
-from tests.conftest import pytestmark, check_clean_channel_close, check_clean_connection_close
+from ammoo_pytest_helpers import pytestmark, check_clean_connection_close, check_clean_channel_close
 
 
 @pytest.mark.timeout(7)

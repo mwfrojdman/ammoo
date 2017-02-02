@@ -8,7 +8,7 @@ from ammoo.connect import connect
 from ammoo.exceptions.channel import ServerClosedChannel
 from ammoo.exceptions.connection import ServerClosedConnection
 from ammoo.wire.methods import METHOD_BASIC_PUBLISH
-from tests.conftest import pytestmark, check_clean_connection_close
+from ammoo_pytest_helpers import pytestmark, check_clean_connection_close
 
 
 def check_exchange_not_found(excinfo):

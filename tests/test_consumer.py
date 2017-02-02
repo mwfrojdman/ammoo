@@ -12,8 +12,8 @@ from ammoo.consumer import Consumer
 from ammoo.exceptions.channel import ServerClosedChannel
 from ammoo.exceptions.consumer import ServerCancelledConsumer
 from ammoo.message import DeliverMessage
-from tests.conftest import pytestmark, check_clean_connection_close, aenumerate, check_clean_channel_close, setup_channel, \
-    aiter, anext, check_clean_consumer_cancel
+from ammoo_pytest_helpers import pytestmark, check_clean_connection_close, check_clean_channel_close, \
+    check_clean_consumer_cancel, aiter, anext, aenumerate, setup_channel
 
 
 @pytest.mark.timeout(7)

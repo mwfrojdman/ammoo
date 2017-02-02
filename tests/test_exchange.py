@@ -8,7 +8,8 @@ from ammoo.exceptions.channel import EmptyQueue, ServerClosedChannel
 from ammoo.exceptions.connection import ServerClosedConnection
 from ammoo.wire.classes import CLASS_EXCHANGE
 from ammoo.wire.methods import METHOD_EXCHANGE_DECLARE
-from tests.conftest import pytestmark, check_clean_channel_close, check_clean_connection_close
+
+from ammoo_pytest_helpers import pytestmark, check_clean_connection_close, check_clean_channel_close
 
 
 @pytest.mark.timeout(7)
