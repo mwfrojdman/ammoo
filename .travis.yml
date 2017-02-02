@@ -1,0 +1,15 @@
+language: python
+python:
+- 3.5
+- 3.6
+services:
+- rabbitmq
+env:
+- AMMOO_TEST_VIRTUALHOST=/
+- AMMOO_TEST_AMQP_HOST=localhost
+install:
+- pip install .[test]
+script:
+- pytest tests
+notifications:
+  email: true
