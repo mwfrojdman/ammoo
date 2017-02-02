@@ -37,7 +37,14 @@ setup(
     # TODO: download_url,
     packages=PACKAGES,
     package_data={'': ['LICENSE']},
-    tests_require=['pytest', 'pytest-asyncio', 'pytest-timeout', 'pytest-capturelog'],
+    extras_require={
+        'test': [
+            'pytest',
+            'pytest-asyncio',
+            'pytest-timeout',
+            'pytest-capturelog',
+        ],
+    },
     license='Apache 2.0',
     classifiers=[
         'Development Status :: 3 - Alpha',
