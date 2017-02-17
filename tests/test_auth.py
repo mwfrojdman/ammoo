@@ -6,17 +6,16 @@ from pytest import raises
 from ammoo.auth.abc import Authentication, AuthenticationMechanism
 from ammoo.auth.mechanisms.sasl_plain import SaslPlainAuth
 from ammoo.auth.password import PasswordAuthentication
-from ammoo.connect import connect
 from ammoo.exceptions.connection import ServerClosedConnection, ServerAuthMechanismsNotSupportedError
 from ammoo_pytest_helpers import pytestmark, check_clean_connection_close, check_clean_channel_close
 
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_bad_user(event_loop, rabbitmq_host):
+async def test_bad_user(connect_to_broker):
     auth = PasswordAuthentication('baduser', 'password')
     with raises(ServerClosedConnection) as ctx:
-        async with await connect(host=rabbitmq_host, loop=event_loop, auth=auth):
+        async with await connect_to_broker(auth=auth):
             pass
     assert ctx.value.reply_code == 403
     assert ctx.value.reply_text.startswith('ACCESS_REFUSED')
@@ -26,10 +25,10 @@ async def test_bad_user(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_bad_password(event_loop, rabbitmq_host):
+async def test_bad_password(connect_to_broker):
     auth = PasswordAuthentication('guest', 'badpass')
     with raises(ServerClosedConnection):
-        async with await connect(host=rabbitmq_host, loop=event_loop, auth=auth):
+        async with await connect_to_broker(auth=auth):
             pass
 
 
@@ -45,9 +44,9 @@ class SaslPlainOnlyAuth(Authentication):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_sasl_plain_auth(event_loop, rabbitmq_host):
+async def test_sasl_plain_auth(connect_to_broker):
     auth = SaslPlainOnlyAuth()
-    async with await connect(host=rabbitmq_host, loop=event_loop, auth=auth) as connection:
+    async with await connect_to_broker(auth=auth) as connection:
         async with connection.channel() as channel:
             pass
         check_clean_channel_close(channel)
@@ -66,9 +65,9 @@ class AmqPlainOnlyAuth(Authentication):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_amqplain_auth(event_loop, rabbitmq_host):
+async def test_amqplain_auth(connect_to_broker):
     auth = AmqPlainOnlyAuth()
-    async with await connect(host=rabbitmq_host, loop=event_loop, auth=auth) as connection:
+    async with await connect_to_broker(auth=auth) as connection:
         async with connection.channel() as channel:
             pass
         check_clean_channel_close(channel)
@@ -77,10 +76,10 @@ async def test_amqplain_auth(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_amqplain_auth_directly(event_loop, rabbitmq_host):
+async def test_amqplain_auth_directly(connect_to_broker):
     """directly as in no Authentication to choose the mech first"""
     auth = AMQPlainAuth('guest', 'guest')
-    async with await connect(host=rabbitmq_host, loop=event_loop, auth=auth) as connection:
+    async with await connect_to_broker(auth=auth) as connection:
         async with connection.channel() as channel:
             pass
         check_clean_channel_close(channel)
@@ -97,9 +96,9 @@ class NoSuitableMechanismsAuth(Authentication):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_no_suitable_auth_mechanism(event_loop, rabbitmq_host):
+async def test_no_suitable_auth_mechanism(connect_to_broker):
     auth = NoSuitableMechanismsAuth()
-    connection = await connect(host=rabbitmq_host, loop=event_loop, auth=auth)
+    connection = await connect_to_broker(auth=auth)
     with raises(ServerAuthMechanismsNotSupportedError) as excinfo:
         await connection.__aenter__()
     assert connection._closing_exc is excinfo.value
@@ -131,9 +130,9 @@ class RabbitAuthMechanismCrDemo(Authentication):
 @pytest.mark.rabbitmq_demoqr
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_rabbit_cr_auth_demo(event_loop, rabbitmq_host):
+async def test_rabbit_cr_auth_demo(connect_to_broker):
     auth = RabbitAuthMechanismCrDemo()
-    async with await connect(host=rabbitmq_host, loop=event_loop, auth=auth) as connection:
+    async with await connect_to_broker(auth=auth) as connection:
         async with connection.channel() as channel:
             pass
         check_clean_channel_close(channel)

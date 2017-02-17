@@ -7,7 +7,6 @@ from ammoo.wire.methods import METHOD_BASIC_CONSUME
 from ammoo.wire.classes import CLASS_BASIC
 from pytest import raises
 
-from ammoo.connect import connect
 from ammoo.consumer import Consumer
 from ammoo.exceptions.channel import ServerClosedChannel
 from ammoo.exceptions.consumer import ServerCancelledConsumer
@@ -18,8 +17,8 @@ from ammoo_pytest_helpers import pytestmark, check_clean_connection_close, check
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_consume_and_cancel(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_consume_and_cancel(connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.select_confirm()
             await channel.delete_queue('testcase_queue')
@@ -44,8 +43,8 @@ async def test_consume_and_cancel(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_server_cancel(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_server_cancel(event_loop, connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.delete_queue('testcase_queue')
             await channel.declare_queue('testcase_queue')
@@ -67,8 +66,8 @@ async def test_server_cancel(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_exclusive(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_exclusive(event_loop, connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.delete_queue('testcase_queue')
             await channel.declare_queue('testcase_queue')
@@ -101,8 +100,8 @@ async def test_exclusive(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(15)
 @pytestmark
-async def test_qos(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_qos(event_loop, connect_to_broker):
+    async with await connect_to_broker() as connection:
         prefetch_count = 23
         message_count = prefetch_count + 10
         async with connection.channel(prefetch_count=prefetch_count) as channel:
@@ -138,7 +137,7 @@ async def test_qos(event_loop, rabbitmq_host):
 @pytest.mark.rabbitmq36
 @pytest.mark.timeout(15)
 @pytestmark
-async def test_consumer_priority(event_loop, rabbitmq_host):
+async def test_consumer_priority(event_loop, connect_to_broker):
     """
     - Set qos prefetch count to 2
     - Publishes 10 messages to a queue
@@ -192,7 +191,7 @@ async def test_consumer_priority(event_loop, rabbitmq_host):
         assert consumer._message_queue.qsize() == 0
         low_to_high.put_nowait('l2')  # go on then, nothing left for high
 
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+    async with await connect_to_broker() as connection:
         async with connection.channel(prefetch_count=2) as channel:
             setup = await setup_channel(event_loop, channel)
             for i in range(10):
@@ -208,10 +207,10 @@ async def test_consumer_priority(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(15)
 @pytestmark
-async def test_recover(event_loop, rabbitmq_host):
+async def test_recover(event_loop, connect_to_broker):
     logger = logging.getLogger('test_recover')
     message_n = 10
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+    async with await connect_to_broker() as connection:
         async with connection.channel(prefetch_count=50) as channel:
             setup = await setup_channel(event_loop, channel)
             # TODO: test this, it causes the server to send basic.ack with multiple=True which we don't support yet

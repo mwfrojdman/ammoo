@@ -6,7 +6,6 @@ from pytest import raises
 
 from ammoo.wire.methods import METHOD_BASIC_PUBLISH
 from ammoo.wire.classes import CLASS_BASIC
-from ammoo.connect import connect
 from ammoo.exceptions.channel import EmptyQueue, ServerClosedChannel
 from ammoo.exceptions.connection import ServerClosedConnection
 from ammoo.wire.low.misc import DELIVERY_MODE_NON_PERSISTENT, DELIVERY_MODE_PERSISTENT
@@ -15,7 +14,7 @@ from ammoo_pytest_helpers import pytestmark, check_clean_connection_close, check
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_cc(event_loop, rabbitmq_host):
+async def test_cc(event_loop, connect_to_broker):
     vanilla_queue_name = 'testcase_queue'
     cc_queue_name = 'testcase_cc_queue'
     bcc_queue_name = 'testcase_bcc_queue'
@@ -23,7 +22,7 @@ async def test_cc(event_loop, rabbitmq_host):
     routing_key = 'testcase_routing_key'
     cc_routing_key = 'testcase_cc_routing_key'
     bcc_routing_key = 'testcase_bcc_routing_key'
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.select_confirm()
             await asyncio.gather(
@@ -64,11 +63,11 @@ async def test_cc(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_delivery_mode(event_loop, rabbitmq_host):
+async def test_delivery_mode(event_loop, connect_to_broker):
     exchange_name = 'test_ex'
     routing_key = 'test_rk'
     queue_name = 'test_q'
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await asyncio.gather(
                 channel.select_confirm(),
@@ -97,8 +96,8 @@ async def test_delivery_mode(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_timestamp(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_timestamp(event_loop, connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             setup = await setup_channel(event_loop, channel)
             timestamp = datetime.now(tz=timezone.utc)
@@ -115,8 +114,8 @@ async def test_timestamp(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_content_encoding(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_content_encoding(event_loop, connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             setup = await setup_channel(event_loop, channel)
 
@@ -190,8 +189,8 @@ async def test_content_encoding(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_json_null(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_json_null(event_loop, connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             setup = await setup_channel(event_loop, channel)
             await channel.publish(setup.exchange_name, setup.routing_key, json=None)
@@ -203,8 +202,8 @@ async def test_json_null(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_json_empty_string(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_json_empty_string(event_loop, connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             setup = await setup_channel(event_loop, channel)
             await channel.publish(setup.exchange_name, setup.routing_key, json='')
@@ -216,9 +215,9 @@ async def test_json_empty_string(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_neither_body_nor_json(event_loop, rabbitmq_host):
+async def test_neither_body_nor_json(event_loop, connect_to_broker):
     """This should raise a TypeError"""
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             setup = await setup_channel(event_loop, channel)
             with raises(TypeError) as excinfo:
@@ -230,8 +229,8 @@ async def test_neither_body_nor_json(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_content_type(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_content_type(event_loop, connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             setup = await setup_channel(event_loop, channel)
 
@@ -288,8 +287,8 @@ async def test_content_type(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_message_id(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_message_id(event_loop, connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             setup = await setup_channel(event_loop, channel)
 
@@ -311,8 +310,8 @@ async def test_message_id(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_user_id(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_user_id(event_loop, connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             setup = await setup_channel(event_loop, channel)
 
@@ -342,8 +341,8 @@ async def test_user_id(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_app_id(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_app_id(event_loop, connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             setup = await setup_channel(event_loop, channel)
 
@@ -364,8 +363,8 @@ async def test_app_id(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_type(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_type(event_loop, connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             setup = await setup_channel(event_loop, channel)
 
@@ -386,8 +385,8 @@ async def test_type(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(10)
 @pytestmark
-async def test_return(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_return(event_loop, connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             setup = await setup_channel(event_loop, channel, routing_key=None)
             # mandatory and no matching routing key for exchange -> message is returned

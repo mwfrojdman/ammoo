@@ -1,7 +1,6 @@
 import pytest
 from pytest import raises
 
-from ammoo.connect import connect
 from ammoo.exceptions.channel import EmptyQueue
 from ammoo_pytest_helpers import pytestmark
 
@@ -10,9 +9,9 @@ from ammoo_pytest_helpers import pytestmark
 @pytest.mark.rabbitmq36
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_headers_bind(event_loop, rabbitmq_host):
+async def test_headers_bind(connect_to_broker):
     """Set up to queues and bind them to an exchange, one with x-match all and one with x-match any"""
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.select_confirm()
             all_queues = 'test_match_all_queue', 'test_match_any_queue'

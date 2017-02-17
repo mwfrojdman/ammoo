@@ -3,7 +3,6 @@ import asyncio
 import pytest
 from pytest import raises
 
-from ammoo.connect import connect
 from ammoo.exceptions.channel import EmptyQueue, ServerClosedChannel
 from ammoo.exceptions.connection import ServerClosedConnection
 from ammoo.wire.classes import CLASS_EXCHANGE
@@ -14,9 +13,9 @@ from ammoo_pytest_helpers import pytestmark, check_clean_connection_close, check
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_declare_invalid_exchange_type(event_loop, rabbitmq_host):
+async def test_declare_invalid_exchange_type(connect_to_broker):
     exchange_name = 'testcase_exchange'
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.delete_exchange(exchange_name)
             with raises(ServerClosedConnection) as excinfo:
@@ -31,12 +30,12 @@ async def test_declare_invalid_exchange_type(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_exchange_to_exchange_bind(event_loop, rabbitmq_host):
+async def test_exchange_to_exchange_bind(event_loop, connect_to_broker):
     queue_name = 'test_queue'
     src_exchange_name = 'test_source_exchange'
     dest_exchange_name = 'test_dest_exchange'
     routing_key = 'test_routing_key'
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await asyncio.gather(
                 channel.select_confirm(),
@@ -68,8 +67,8 @@ async def test_exchange_to_exchange_bind(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_alternate_exchange(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_alternate_exchange(event_loop, connect_to_broker):
+    async with await connect_to_broker() as connection:
         orig_exchange_name = 'test_orig_ex'
         alternate_exchange_name = 'test_alt_ex'
         queue_name = 'test_q'
@@ -100,8 +99,8 @@ async def test_alternate_exchange(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_exchange_exists(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_exchange_exists(connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             exchange_name = 'testcase_exchange'
             await channel.delete_exchange(exchange_name)

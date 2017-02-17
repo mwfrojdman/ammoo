@@ -4,7 +4,6 @@ import pytest
 from pytest import raises
 
 from ammoo.channel import Channel
-from ammoo.connect import connect
 from ammoo.exceptions.channel import EmptyQueue
 from ammoo.message import Message, GetMessage
 from ammoo_pytest_helpers import pytestmark, check_clean_connection_close, check_clean_channel_close
@@ -23,8 +22,8 @@ async def test_open_channel(connect_to_broker):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_exchange_declare(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_exchange_declare(connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.delete_exchange('testcase_exchange')
             await channel.declare_exchange('testcase_exchange', 'fanout')
@@ -36,8 +35,8 @@ async def test_exchange_declare(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_queue_declare(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_queue_declare(connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.delete_queue('testcase_queue')
             await channel.declare_queue('testcase_queue')
@@ -50,8 +49,8 @@ async def test_queue_declare(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_queue_bind(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_queue_bind(connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.declare_queue('testcase_queue')
             await channel.declare_exchange('testcase_exchange', 'fanout')
@@ -64,8 +63,8 @@ async def test_queue_bind(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_publish_bytes(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_publish_bytes(connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.declare_exchange('testcase_exchange', 'fanout')
             await channel.select_confirm()  # so server has a chance to nack/close
@@ -78,8 +77,8 @@ async def test_publish_bytes(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_publish_json(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_publish_json(connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.declare_exchange('testcase_exchange', 'fanout')
             await channel.select_confirm()
@@ -91,8 +90,8 @@ async def test_publish_json(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_get_empty(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_get_empty(connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.delete_queue('testcase_queue')
             await channel.declare_queue('testcase_queue')
@@ -104,8 +103,8 @@ async def test_get_empty(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_get_ok(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_get_ok(event_loop, connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.select_confirm()
             await channel.delete_queue('testcase_queue')
@@ -127,8 +126,8 @@ async def test_get_ok(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_empty_message(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_empty_message(event_loop, connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.select_confirm()
             await channel.delete_queue('testcase_queue')
@@ -148,9 +147,9 @@ async def test_empty_message(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_message_reject(event_loop, rabbitmq_host):
+async def test_message_reject(event_loop, connect_to_broker):
     queue_name = 'testcase_queue'
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.select_confirm()
             await channel.delete_queue(queue_name)
@@ -179,8 +178,8 @@ async def test_message_reject(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_multiple_select_confirms(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_multiple_select_confirms(connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.select_confirm()
             await channel.select_confirm()

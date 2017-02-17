@@ -7,10 +7,8 @@ import pytest
 from pytest import raises
 
 from ammoo.exceptions.channel import EmptyQueue
-
 from ammoo.channel import Channel
 
-from ammoo.connect import connect
 from ammoo_pytest_helpers import pytestmark, check_clean_connection_close, check_clean_channel_close
 
 Names = namedtuple('Names', 'exchange_name get_queue_name get_routing_key consume_queue_name consume_routing_key')
