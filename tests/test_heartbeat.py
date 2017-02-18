@@ -8,11 +8,10 @@ from ammoo.wire.class_and_method import CONNECTION_TUNE_OK_CAM
 
 from ammoo.wire.frames.method.connection import parse_connection_tune_parameters, pack_connection_tune_ok_parameters
 from ammoo.auth.password import PasswordAuthentication
-from ammoo.connect import connect
 from ammoo.connection import Connection
-from ammoo.exceptions.connection import ServerClosedConnection, ClientClosedConnection, HeartbeatTimeout, ConnectionLost
+from ammoo.exceptions.connection import HeartbeatTimeout, ConnectionLost
 
-from tests.conftest import pytestmark, check_clean_connection_close
+from ammoo_pytest_helpers import pytestmark, check_clean_connection_close
 
 
 class _NoClientHeartbeatsConnection(Connection):
@@ -40,10 +39,10 @@ class _NoServerHeartbeatsConnection(Connection):
 
 @pytest.mark.timeout(20)
 @pytestmark
-async def test_miss_client_heartbeat(event_loop, rabbitmq_host):
+async def test_miss_client_heartbeat(event_loop, rabbitmq_host, rabbitmq_virtualhost):
     """Wait until server closes connection because the client (=we) didn't send heartbeats"""
     protocol_factory = partial(
-        _NoClientHeartbeatsConnection, virtualhost='/', loop=event_loop, heartbeat_interval=1,
+        _NoClientHeartbeatsConnection, virtualhost=rabbitmq_virtualhost, loop=event_loop, heartbeat_interval=1,
         auth=PasswordAuthentication('guest', 'guest'), frame_max=2*1024**2
     )
 
@@ -58,10 +57,10 @@ async def test_miss_client_heartbeat(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(20)
 @pytestmark
-async def test_miss_server_heartbeat(event_loop, rabbitmq_host):
+async def test_miss_server_heartbeat(event_loop, rabbitmq_host, rabbitmq_virtualhost):
     """Fool client to expect heartbeats sooner (every 1 sec) from server than it sends (60 secs)"""
     protocol_factory = partial(
-        _NoServerHeartbeatsConnection, virtualhost='/', loop=event_loop, heartbeat_interval=1,
+        _NoServerHeartbeatsConnection, virtualhost=rabbitmq_virtualhost, loop=event_loop, heartbeat_interval=1,
         auth=PasswordAuthentication('guest', 'guest'), frame_max=2*1024**2
     )
 
@@ -76,9 +75,9 @@ async def test_miss_server_heartbeat(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(15)
 @pytestmark
-async def test_idle_connection(event_loop, rabbitmq_host):
+async def test_idle_connection(event_loop, connect_to_broker):
     """Keep connection idle for 10 rounds of heartbeats, without disconnects"""
-    async with await connect(host=rabbitmq_host, loop=event_loop, heartbeat_interval=1) as connection:
+    async with await connect_to_broker(heartbeat_interval=1) as connection:
         assert connection._heartbeat_interval == 1
         async with connection.channel():
             await asyncio.sleep(10.0, loop=event_loop)
@@ -87,10 +86,10 @@ async def test_idle_connection(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(15)
 @pytestmark
-async def test_no_heartbeats(event_loop, rabbitmq_host):
+async def test_no_heartbeats(event_loop, connect_to_broker):
     # TODO: improve this so that there is a Connection subclass which overrides _heartbeat_subscriber and raises
     # an exception if there is a heartbeat sent. Might need a longer sleep, as Rabbit's default is 60 secs
-    async with await connect(host=rabbitmq_host, loop=event_loop, heartbeat_interval=0) as connection:
+    async with await connect_to_broker(heartbeat_interval=0) as connection:
         assert connection._heartbeat_interval == 0
         async with connection.channel():
             await asyncio.sleep(10.0, loop=event_loop)

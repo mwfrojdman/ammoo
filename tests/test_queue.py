@@ -4,20 +4,19 @@ from datetime import datetime
 import pytest
 from pytest import raises
 
-from ammoo.connect import connect
 from ammoo.exceptions.channel import ServerClosedChannel, EmptyQueue
 from ammoo.wire.classes import CLASS_BASIC, CLASS_QUEUE
 from ammoo.wire.methods import METHOD_BASIC_GET, METHOD_QUEUE_PURGE, METHOD_QUEUE_DECLARE
-from tests.conftest import pytestmark, check_clean_connection_close, check_clean_channel_close, aenumerate, azip
+from ammoo_pytest_helpers import pytestmark, check_clean_connection_close, check_clean_channel_close, aenumerate, azip
 
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_queue_expires(event_loop, rabbitmq_host):
+async def test_queue_expires(event_loop, connect_to_broker):
     queue_name = 'testcase_queue'
     exchange_name = 'testcase_exchange'
     routing_key = 'testcase_routing_key'
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.select_confirm()
             await channel.delete_exchange(exchange_name)
@@ -46,11 +45,11 @@ async def test_queue_expires(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_queue_max_length(event_loop, rabbitmq_host):
+async def test_queue_max_length(connect_to_broker):
     queue_name = 'testcase_queue'
     exchange_name = 'testcase_exchange'
     routing_key = 'testcase_routing_key'
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.select_confirm()
             await channel.delete_exchange(exchange_name)
@@ -75,11 +74,11 @@ async def test_queue_max_length(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_queue_max_length_bytes(event_loop, rabbitmq_host):
+async def test_queue_max_length_bytes(connect_to_broker):
     queue_name = 'testcase_queue'
     exchange_name = 'testcase_exchange'
     routing_key = 'testcase_routing_key'
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.select_confirm()
             await channel.delete_exchange(exchange_name)
@@ -106,7 +105,7 @@ async def test_queue_max_length_bytes(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_dead_letter_exchange(event_loop, rabbitmq_host):
+async def test_dead_letter_exchange(event_loop, connect_to_broker):
     def check_message_1(message):
         assert message.body == b'message 1'
         assert message.routing_key == 'orig_rk1'
@@ -137,7 +136,7 @@ async def test_dead_letter_exchange(event_loop, rabbitmq_host):
     dead_queue_name = 'testcase_dead_queue'
     orig_exchange_name = 'testcase_orig_exchange'
     dead_exchange_name = 'testcase_dead_exchange'
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.select_confirm()
             await asyncio.gather(
@@ -190,11 +189,11 @@ async def test_dead_letter_exchange(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_priority(event_loop, rabbitmq_host):
+async def test_priority(event_loop, connect_to_broker):
     queue_name = 'testcase_queue'
     exchange_name = 'testcase_exchange'
     routing_key = 'testcase_routing_key'
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+    async with await connect_to_broker() as connection:
         async with connection.channel(prefetch_count=2) as channel:
             await channel.select_confirm()
             await asyncio.gather(
@@ -226,8 +225,8 @@ async def test_priority(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_purge_no_queue_name(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_purge_no_queue_name(connect_to_broker):
+    async with await connect_to_broker() as connection:
         # first channel gets closed because we purge a nonexisting queue
         async with connection.channel() as channel:
             with raises(ServerClosedChannel) as excinfo:
@@ -258,8 +257,8 @@ async def test_purge_no_queue_name(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_queue_exists(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_queue_exists(connect_to_broker):
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             queue_name = 'testcase_queue'
             await channel.delete_queue(queue_name)

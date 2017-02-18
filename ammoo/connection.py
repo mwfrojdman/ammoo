@@ -438,8 +438,8 @@ class Connection(asyncio.StreamReaderProtocol):
 
         if self._client_heartbeat_interval is None:
             self._heartbeat_interval = tune_params.heartbeat
-        elif self._client_heartbeat_interval == 0 or tune_params.heartbeat == 0:
-            self._heartbeat_interval = 0
+        elif tune_params.heartbeat == 0:
+            self._heartbeat_interval = self._client_heartbeat_interval
         else:
             self._heartbeat_interval = min(self._client_heartbeat_interval, tune_params.heartbeat)
         logger.debug('Setting heartbeat interval to %r', self._heartbeat_interval)

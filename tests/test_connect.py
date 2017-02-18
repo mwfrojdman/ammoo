@@ -5,7 +5,7 @@ from pytest import raises
 
 from ammoo.connect import connect
 from ammoo.connection import Connection
-from tests.conftest import pytestmark
+from ammoo_pytest_helpers import pytestmark
 
 
 @pytestmark
@@ -13,17 +13,18 @@ async def test_connect_no_server(event_loop):
     with raises(OSError):
         await connect(port=10000, loop=event_loop)
 
+
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_connect(event_loop, rabbitmq_host):
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+async def test_connect(connect_to_broker):
+    async with await connect_to_broker() as connection:
         assert isinstance(connection, Connection)
 
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_connect_cancel(event_loop, rabbitmq_host):
-    task = event_loop.create_task(connect(host=rabbitmq_host, loop=event_loop))
+async def test_connect_cancel(event_loop, connect_to_broker):
+    task = event_loop.create_task(connect_to_broker(connect_to_broker))
     task.cancel()
     with raises(asyncio.CancelledError):
         await task
@@ -31,8 +32,8 @@ async def test_connect_cancel(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_connect_aenter_cancel(event_loop, rabbitmq_host):
-    connection = await connect(host=rabbitmq_host, loop=event_loop)
+async def test_connect_aenter_cancel(event_loop, connect_to_broker):
+    connection = await connect_to_broker()
     task = event_loop.create_task(connection.__aenter__())
     async def once():
         pass

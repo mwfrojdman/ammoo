@@ -1,9 +1,8 @@
 import pytest
 
-from ammoo.connect import connect
 from ammoo.connection import Connection
 from ammoo.wire.frames import FRAME_TYPE_BODY
-from tests.conftest import pytestmark, check_clean_channel_close, check_clean_connection_close, setup_channel
+from ammoo_pytest_helpers import pytestmark, check_clean_connection_close, check_clean_channel_close, setup_channel
 
 
 class FrameMaxConnection(Connection):
@@ -25,11 +24,9 @@ class FrameMaxConnection(Connection):
 
 @pytest.mark.timeout(10)
 @pytestmark
-async def test_frame_max(event_loop, rabbitmq_host):
+async def test_frame_max(event_loop, connect_to_broker):
     frame_max = 10 * 1024  # 10kB
-    async with await connect(
-            host=rabbitmq_host, loop=event_loop, frame_max=frame_max, connection_factory=FrameMaxConnection
-    ) as connection:
+    async with await connect_to_broker(frame_max=frame_max, connection_factory=FrameMaxConnection) as connection:
         assert connection.frame_max == frame_max
         assert isinstance(connection, FrameMaxConnection)
         async with connection.channel() as channel:

@@ -1,0 +1,18 @@
+language: python
+python:
+- 3.5
+- 3.6
+services:
+- rabbitmq
+env:
+  global:
+  - AMMOO_TEST_VIRTUALHOST=/
+  - AMMOO_TEST_AMQP_HOST=localhost
+install:
+- pip install .[test]
+before_script:
+- export PYTHONPATH=$(pwd)/tests/helpers
+script:
+- pytest tests -k "not rabbitmq_demoqr"
+notifications:
+  email: true

@@ -1,19 +1,14 @@
-import asyncio
 import pytest
-from pytest import raises
 
-from ammoo.connect import connect
-from ammoo.exceptions.channel import EmptyQueue
-from ammoo.message import GetMessage
-from tests.conftest import pytestmark, setup_channel, check_clean_channel_close, check_clean_connection_close
+from ammoo_pytest_helpers import pytestmark, check_clean_connection_close, check_clean_channel_close, setup_channel
 
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_reply(event_loop, rabbitmq_host):
+async def test_reply(connect_to_broker):
     """Publish a message with reply_to and correlation_id, get it from queue, use Message.reply(), get the reply message
     from the server"""
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.select_confirm()
             await channel.delete_queue('testcase_queue')
