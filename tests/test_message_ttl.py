@@ -3,18 +3,17 @@ import asyncio
 import pytest
 from pytest import raises
 
-from ammoo.connect import connect
 from ammoo.exceptions.channel import EmptyQueue
-from tests.conftest import pytestmark, check_clean_channel_close, check_clean_connection_close
+from ammoo_pytest_helpers import pytestmark, check_clean_connection_close, check_clean_channel_close
 
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_queue_ttl(event_loop, rabbitmq_host):
+async def test_queue_ttl(event_loop, connect_to_broker):
     queue_name = 'testcase_queue'
     exchange_name = 'testcase_exchange'
     routing_key = 'testcase_routing_key'
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.select_confirm()
             await channel.delete_queue(queue_name)
@@ -44,11 +43,11 @@ async def test_queue_ttl(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_message_ttl(event_loop, rabbitmq_host):
+async def test_message_ttl(event_loop, connect_to_broker):
     queue_name = 'testcase_queue'
     exchange_name = 'testcase_exchange'
     routing_key = 'testcase_routing_key'
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             await channel.select_confirm()
             await channel.delete_queue(queue_name)

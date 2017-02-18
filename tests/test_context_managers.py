@@ -4,11 +4,10 @@ from ammoo.wire.classes import CLASS_BASIC
 from ammoo.wire.frames.body import FRAME_TYPE_BODY
 from pytest import raises
 
-from ammoo.connect import connect
 from ammoo.exceptions.channel import ServerClosedChannel
 from ammoo.exceptions.connection import ServerClosedConnection
 from ammoo.wire.methods import METHOD_BASIC_PUBLISH
-from tests.conftest import pytestmark, check_clean_connection_close
+from ammoo_pytest_helpers import pytestmark, check_clean_connection_close
 
 
 def check_exchange_not_found(excinfo):
@@ -22,12 +21,12 @@ def check_exchange_not_found(excinfo):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_caught_channel_exception(event_loop, rabbitmq_host):
+async def test_caught_channel_exception(connect_to_broker):
     """A Channel closed exception raised inside async with channel() should not escape the context manager
     when it's caught inside the context manager"""
     exchange_name = 'testcase_exchange'
     routing_key = 'testcase_routing_key'
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             # without this channel.publish won't raise an exception, instead it occurs in channel.__aexit__
             await channel.select_confirm()
@@ -41,12 +40,12 @@ async def test_caught_channel_exception(event_loop, rabbitmq_host):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_uncaught_channel_exception(event_loop, rabbitmq_host):
+async def test_uncaught_channel_exception(event_loop, connect_to_broker):
     """A Channel closed exception raised inside async with channel() should escape the context manager
     when it's not caught inside it"""
     exchange_name = 'testcase_exchange'
     routing_key = 'testcase_routing_key'
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+    async with await connect_to_broker() as connection:
         delete_succeeded = False
         publish_succeeded = False
         with raises(ServerClosedChannel) as excinfo:
@@ -73,12 +72,12 @@ def _assert_unexpcted_frame(exc):
 
 @pytest.mark.timeout(7)
 @pytestmark
-async def test_caught_connection_exception_in_channel(event_loop, rabbitmq_host):
+async def test_caught_connection_exception_in_channel(connect_to_broker):
     """A Connection closed exception raised inside async with channel() should not escape the context manager
     when it's caught inside the context manager"""
     exchange_name = 'testcase_exchange'
     routing_key = 'testcase_routing_key'
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel:
             # without this channel.publish won't raise an exception, instead it occurs in channel.__aexit__
             await channel.select_confirm()

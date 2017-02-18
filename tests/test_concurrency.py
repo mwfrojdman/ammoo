@@ -7,12 +7,9 @@ import pytest
 from pytest import raises
 
 from ammoo.exceptions.channel import EmptyQueue
-
 from ammoo.channel import Channel
 
-from ammoo.connect import connect
-from tests.conftest import pytestmark, check_clean_channel_close, check_clean_connection_close
-
+from ammoo_pytest_helpers import pytestmark, check_clean_connection_close, check_clean_channel_close
 
 Names = namedtuple('Names', 'exchange_name get_queue_name get_routing_key consume_queue_name consume_routing_key')
 
@@ -78,13 +75,13 @@ async def consume_messages(channel: Channel, names: Names, do_ack: bool, loop, b
                     tasks = []
 
 
-@pytest.mark.timeout(30)
+@pytest.mark.timeout(60)
 @pytestmark
-async def test_concurrency(event_loop, rabbitmq_host):
+async def test_concurrency(connect_to_broker, event_loop):
     logger = logging.getLogger('testcase')
     iterations = 10
     publish_batch_size = 300
-    async with await connect(host=rabbitmq_host, loop=event_loop) as connection:
+    async with await connect_to_broker() as connection:
         async with connection.channel() as channel_one, connection.channel() as channel_two:
             names = await setup_concurrent_queues(channel_one)
             consumed_ids = set()
