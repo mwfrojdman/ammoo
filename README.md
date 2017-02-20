@@ -35,18 +35,19 @@ if __name__ == '__main__':
     loop.run_until_complete(server())
 ```
 
-> python rpc_server.py
-> Received message 0: first (as bytes: b'first')
-> Replying to RPC request
-> Received message 1: second (as bytes: b'second')
-> Replying to RPC request
-> Received message 2: third (as bytes: b'third')
-> Replying to RPC request
-
+```
+# python rpc_server.py
+Received message 0: first (as bytes: b'first')
+Replying to RPC request
+Received message 1: second (as bytes: b'second')
+Replying to RPC request
+Received message 2: third (as bytes: b'third')
+Replying to RPC request
+```
 
 ### RPC Client
 
-```
+```python
 import sys
 import asyncio
 
@@ -73,12 +74,14 @@ if __name__ == '__main__':
     loop.run_until_complete(client(body))
 ```
 
-> python rpc_client.py first
-> Expecting replies to queue amq.gen-mHXRv6P4WyfG_QAEIsa4wQ
-> My message was number 0 received by server
-> python rpc_client.py second
-> Expecting replies to queue amq.gen-RrZlLiHZSp8We4Ee0nkg4A
-> My message was number 1 received by server
-> python rpc_client.py third
-> Expecting replies to queue amq.gen-Op0XhCr7HQRR7tY8sCknVQ
-> My message was number 2 received by server
+```
+# python rpc_client.py first
+Expecting replies to queue amq.gen-mHXRv6P4WyfG_QAEIsa4wQ
+My message was number 0 received by server
+# python rpc_client.py second
+Expecting replies to queue amq.gen-RrZlLiHZSp8We4Ee0nkg4A
+My message was number 1 received by server
+# python rpc_client.py third
+Expecting replies to queue amq.gen-Op0XhCr7HQRR7tY8sCknVQ
+My message was number 2 received by server
+```
