@@ -28,14 +28,17 @@ def get_version():
     raise ValueError('No version found')
 
 
+VERSION = get_version()
+
+
 setup(
     name=PACKAGE_NAME,
-    version=get_version(),
+    version=VERSION,
     author='Mathias Fröjdman',
     author_email='mwf@iki.fi',
     url='https://github.com/mwfrojdman/ammoo',
     description='AMQP library with a pythonic API for asyncio on Python 3.5+',
-    # TODO: download_url,
+    download_url='https://github.com/mwfrojdman/ammoo/archive/{}.tar.gz'.format(VERSION),
     packages=PACKAGES,
     package_data={'': ['LICENSE']},
     extras_require={
