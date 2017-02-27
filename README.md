@@ -1,13 +1,8 @@
 # ammoo
 Pythonic AMQP library for asyncio
 
-## Documentation
-
-https://ammoo.readthedocs.io/en/latest/
-
-## Builds
-
-https://pypi.python.org/pypi/ammoo
+* Documentation: https://ammoo.readthedocs.io/en/latest/
+* Builds: https://pypi.python.org/pypi/ammoo
 
 ## Remote procedure call example
 
