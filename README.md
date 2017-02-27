@@ -96,11 +96,11 @@ My message was number 2 received by server
 
 ## Installation
 
-Just say
-
 ```bash
 pip install ammoo
 ```
+
+You'll need Python ≥ 3.5.
 
 ## To contribute
 * Create an issue if there isn't already one for your change on https://github.com/mwfrojdman/ammoo/issues
