@@ -52,6 +52,7 @@ setup(
     license='Apache 2.0',
     classifiers=[
         'Development Status :: 4 - Beta',
+	'Framework :: AsyncIO',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
