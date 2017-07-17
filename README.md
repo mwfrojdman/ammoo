@@ -1,6 +1,9 @@
 # ammoo
 Pythonic AMQP library for asyncio
 
+* Documentation: https://ammoo.readthedocs.io/en/latest/
+* Builds: https://pypi.python.org/pypi/ammoo
+
 ## Remote procedure call example
 
 ### RPC Server
@@ -85,3 +88,16 @@ My message was number 1 received by server
 Expecting replies to queue amq.gen-Op0XhCr7HQRR7tY8sCknVQ
 My message was number 2 received by server
 ```
+
+## Installation
+
+```bash
+pip install ammoo
+```
+
+You'll need Python ≥ 3.5.
+
+## To contribute
+* Create an issue if there isn't already one for your change on https://github.com/mwfrojdman/ammoo/issues
+* Fork the repository and base your changes on the master branch
+* Create a pull request
