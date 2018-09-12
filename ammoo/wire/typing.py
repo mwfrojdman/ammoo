@@ -1,5 +1,4 @@
-from collections import OrderedDict, deque
-from typing import NewType, TypeVar, List, Dict, Union, MutableSequence, _geqv
+from typing import NewType, TypeVar, List, Dict, Union
 
 VirtualHost = NewType('VirtualHost', str)
 ConsumerTag = NewType('ConsumerTag', str)
@@ -27,19 +26,3 @@ EncodeJson = TypeVar('EncodeJson', None, int, float, str, List['DecodeJson'], Di
 T = TypeVar('T')  # Any type.
 KT = TypeVar('KT')  # Key type.
 VT = TypeVar('VT')  # Value type.
-
-
-class Deque(deque, MutableSequence[T], extra=deque):
-    def __new__(cls, *args, **kwds):
-        if _geqv(cls, Deque):
-            raise TypeError("Type Deque cannot be instantiated; "
-                            "use deque() instead")
-        return deque.__new__(cls, *args, **kwds)
-
-
-class OrderedDictT(OrderedDict, Dict[KT, VT], extra=OrderedDict):
-    def __new__(cls, *args, **kwds):
-        if _geqv(cls, OrderedDict):
-            raise TypeError("Type OrderedDictT cannot be instantiated; "
-                            "use OrderedDict() instead")
-        return OrderedDict.__new__(cls, *args, **kwds)
