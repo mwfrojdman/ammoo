@@ -8,7 +8,7 @@ from asyncio import QueueFull
 from collections import Mapping, OrderedDict, deque
 from datetime import datetime
 from functools import partial
-from typing import Dict, Tuple, Iterator, Union, Optional
+from typing import Tuple, Iterator, Union, Optional
 
 from ammoo._utils import add_int_arg, add_routing_keys_header
 from ammoo.consumer import Consumer
@@ -41,7 +41,7 @@ from ammoo.wire.low.containers import FieldValue
 from ammoo.wire.low.misc import BOOLEAN_FALSE_DATA, pack_boolean
 from ammoo.wire.low.strings import EMPTY_SHORTSTR_DATA
 from ammoo.wire.typing import MessageCount, ConsumerTag, ExchangeName, ExchangeType, RoutingKey, QueueName, \
-    DeliveryMode, DeliveryTag, EncodeJson, OrderedDictT, Deque
+    DeliveryMode, DeliveryTag, EncodeJson
 
 __all__ = 'Channel',
 
@@ -169,11 +169,12 @@ class Channel:
                 EXCHANGE_BIND_OK_CAM, QUEUE_DECLARE_OK_CAM, QUEUE_DELETE_OK_CAM, QUEUE_PURGE_OK_CAM,
                 QUEUE_BIND_OK_CAM, QUEUE_UNBIND_OK_CAM, CONFIRM_SELECT_OK_CAM, BASIC_QOS_OK_CAM, BASIC_RECOVER_OK_CAM
             }
-        }  # type: Dict[int, Deque[asyncio.Future]]
+        }  # TODO: when restoring typing, add type: Dict[int, Deque[asyncio.Future]]
         get_ok_or_empty_deque = deque()
         for cam in BASIC_GET_OK_CAM, BASIC_GET_EMPTY_CAM:
             self._cam_waiters[cam] = get_ok_or_empty_deque
-        self._pending_acks = OrderedDict()  # type: OrderedDictT[DeliveryTag, asyncio.Future]
+        # TODO: when restoring typing, add type: OrderedDictT[DeliveryTag, asyncio.Future]
+        self._pending_acks = OrderedDict()
 
     async def get_next_returned_message(self) -> ReturnMessage:
         """Returns the next basic.return message we have"""
